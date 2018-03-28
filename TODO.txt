@@ -1,0 +1,3 @@
+1) Recreate own version of application in http://www.bebetterdeveloper.com/coding/architecture/serverless-system-architecture-using-aws.html
+2) init a serverless project to deploy ENTIRE application using serverless cli.  Use s3 serverless plugin to host static app
+
