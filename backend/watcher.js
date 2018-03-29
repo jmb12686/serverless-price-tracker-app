@@ -49,10 +49,6 @@ module.exports.run = (event, context, callback) => {
             });
 
         });
-        //item.latestDetails[latestPrice]=x;
-        //item.latestDetails[timestamp]=y;
-
-
       });
       console.log("Done scanning, returning now...");
       callback(null, "Success");

@@ -35,6 +35,18 @@ functions:
     events:
       - schedule: rate(15 minutes)
 
+  notifier:
+    description: Consumes DynamoDB table stream and sends notification if latest price is less than threshold
+    handler: notifier.handle
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt:
+              - WatchedItemsDynamoDBTable
+              - StreamArn
+          batchSize: 1
+
 resources:
   Resources:
     WatchedItemsDynamoDBTable:
@@ -44,15 +56,6 @@ resources:
           -
             AttributeName: url
             AttributeType: S
-          # -
-          #   AttributeName: name
-          #   AttributeType: S
-          # -
-          #   AttributeName: initialPrice
-          #   AttributeType: N
-          # -
-          #   AttributeName: notificationThreshold
-          #   AttributeType: N
         KeySchema:
           -
             AttributeName: url
@@ -60,6 +63,6 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
-        #StreamSpecification:
-        #  StreamViewType: NEW_IMAGE
+        StreamSpecification:
+          StreamViewType: NEW_IMAGE
         TableName: ${self:custom.tableName}
