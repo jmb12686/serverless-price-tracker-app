@@ -1,0 +1,63 @@
+service: price-tracker-app
+
+custom:
+  tableName: 'watched-items-table-${self:provider.stage}'
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: dev
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - { "Fn::GetAtt": ["WatchedItemsDynamoDBTable", "Arn" ] }
+  environment:
+    WATCHED_ITEMS_TABLE: ${self:custom.tableName}
+
+functions:
+  web-app-api:
+    handler: index.handler
+    events:
+      - http: ANY /
+      - http: 'ANY {proxy+}'
+
+  watcher-cron:
+    description: Trigger job to run thru all items watched, update latest price, and send notifications if threshold met
+    handler: watcher.run #execute watcher.js run functions
+    events:
+      - schedule: rate(15 minutes)
+
+resources:
+  Resources:
+    WatchedItemsDynamoDBTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: url
+            AttributeType: S
+          # -
+          #   AttributeName: name
+          #   AttributeType: S
+          # -
+          #   AttributeName: initialPrice
+          #   AttributeType: N
+          # -
+          #   AttributeName: notificationThreshold
+          #   AttributeType: N
+        KeySchema:
+          -
+            AttributeName: url
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.tableName}
