@@ -23,7 +23,7 @@ module.exports.run = (event, context, callback) => {
       data.Items.forEach(function(item) {
         console.log("TODO: Get latest price for item: "+JSON.stringify(item));
         console.log("TODO: IF latest price < threshold, send notification!");
-      }
+      });
       console.log("Done scanning, returning now...");
       callback(null, "Success");
     }
