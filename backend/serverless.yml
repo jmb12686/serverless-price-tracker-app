@@ -58,6 +58,8 @@ resources:
             AttributeName: url
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        #StreamSpecification:
+        #  StreamViewType: NEW_IMAGE
         TableName: ${self:custom.tableName}
