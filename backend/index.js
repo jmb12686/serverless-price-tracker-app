@@ -28,7 +28,7 @@ app.get('/api/v1/price/:productUrl', function(req, res) {
 });
 
 app.post('/api/v1/watch', function (req, res) {
-  const{url, priceThreshold} = req.body;
+  const{url, priceThreshold, notificationPhoneNumber} = req.body;
   console.log('****** getting productDetails and watching item @ URL: '+url);
   scraper.getDetails(url, function(itemDetails) {
     console.log("scraped details.....");
@@ -44,11 +44,12 @@ app.post('/api/v1/watch', function (req, res) {
           category: itemDetails.category,
           initialPrice: itemDetails.price,
           priceThreshold: priceThreshold,
+          notificationPhoneNumber: notificationPhoneNumber,
         },
     };
     dynamoDb.put(params, (error) => {
       if (error) {
-        console.log(error);
+        console.error("Unable to delete item. Error JSON:", JSON.stringify(error, null, 2));
         res.status(400).json({ error: 'Could not item in watch table' });
       }
       res.json({ status: 'successfully watching item',  });
@@ -57,5 +58,24 @@ app.post('/api/v1/watch', function (req, res) {
   });
 });
 
+app.post('/api/v1/unwatch', function (req, res) {
+  const url = req.body;
+  console.log("******* Unwatching product @ URL: "+url);
+  const params = {
+    TableName: WATCHED_ITEMS_TABLE,
+    Key:{
+      "url": url,
+    },
+  };
+
+  dynamoDb.delete(params, (error) => {
+    if(error) {
+      console.error("Unable to delete item. Error JSON:", JSON.stringify(error, null, 2));
+      res.status(400).json({ error: 'Could not unwatch item'});
+    }
+    res.json({ status: 'successfully unwatched item'});
+  });
+
+});
 
 module.exports.handler = serverless(app);

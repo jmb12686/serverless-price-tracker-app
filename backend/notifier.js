@@ -1,9 +1,22 @@
 'use strict';
+const AWS = require("aws-sdk");
+const parse = AWS.DynamoDB.Converter.output;
 
 module.exports.handle = (event, context, callback) => {
 
   event.Records.forEach((record) => {
-    console.log('Stream record: ', JSON.stringify(record, null, 2));
+    console.log(`Received eventID: ${record.eventID}, eventName: ${record.eventName}` )
+    var dynamoRecord = parse({ "M": record.dynamodb.NewImage });
+    console.log("DynamoDB Record: ", JSON.stringify(dynamoRecord, null, 2));
+    if (record.eventName == 'MODIFY') {
+      //watched item was modified.  latest price was updated, or notification threshold was changed!
+      if(dynamoRecord.latestDetails.latestPrice <= dynamoRecord.priceThreshold) {
+        console.log("latestPrice for item is less than or equal to priceThreshold ")
+        //TODO Send Notification!!
+      }
+    }
+
+    // console.log('RStream record: ', JSON.stringify(record, null, 2));
 
     // if (record.eventName == 'INSERT') {
     //   var who = JSON.stringify(record.dynamodb.NewImage.Username.S);

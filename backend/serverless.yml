@@ -33,11 +33,12 @@ functions:
     description: Trigger job to run thru all items watched, update latest price, and send notifications if threshold met
     handler: watcher.run #execute watcher.js run functions
     events:
-      - schedule: rate(15 minutes)
+      - schedule: rate(120 minutes)
 
   notifier:
     description: Consumes DynamoDB table stream and sends notification if latest price is less than threshold
     handler: notifier.handle
+    memorySize: 128
     events:
       - stream:
           type: dynamodb
