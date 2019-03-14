@@ -5,9 +5,9 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs6.10
+  runtime: nodejs8.10
   stage: dev
-  region: us-east-1
+  region: us-east-2
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -33,7 +33,7 @@ functions:
     description: Trigger job to run thru all items watched, update latest price, and send notifications if threshold met
     handler: watcher.run #execute watcher.js run functions
     events:
-      - schedule: rate(120 minutes)
+      - schedule: rate(1440 minutes)
 
   notifier:
     description: Consumes DynamoDB table stream and sends notification if latest price is less than threshold
