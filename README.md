@@ -18,3 +18,31 @@ npm install
 ```bash
 serverless deploy --aws-profile <AWS_CREDENTIAL_PROFILE_NAME>
 ```
+
+### Usage
+Obtain the **ServiceEndpoint** url from the cloudformation stack output.  This is the entry point to API Gateway for our app deployment and will be the root base URL for our API.  
+
+#### Get Price
+`$ROOT_BASE_URL/api/v1/price/$PRODUCT_URL` - Get price for item.  Example Usage:
+
+`https://XXXXXXXX.execute-api.us-east-2.amazonaws.com/dev/api/v1/price/https%3A%2F%2Fwww.walmart.com%2Fip%2FParent-s-Choice-HMO-NonGMO-Sensitivity-Infant-Formula-4-Pack-33-2oz-ea%2F407822086`
+
+* `$ROOT_BASE_URL` - ServiceEndpoint / API Gateway endpoint
+* `$PRODUCT_URL` - URL of product to scrape price from.  Must be URL encoded.
+
+#### Get Product Details
+`$ROOT_BASE_URL/api/v1/productDetails/$PRODUCT_URL` - Get details for item.  Example Usage:
+
+`https://XXXXXXXX.execute-api.us-east-2.amazonaws.com/dev/api/v1/productDetails/https%3A%2F%2Fwww.walmart.com%2Fip%2FParent-s-Choice-HMO-NonGMO-Sensitivity-Infant-Formula-4-Pack-33-2oz-ea%2F407822086`
+
+* `$ROOT_BASE_URL` - ServiceEndpoint / API Gateway endpoint
+* `$PRODUCT_URL` - URL of product to scrape details from.  Must be URL encoded.
+
+#### Watch item for price drop notifications
+`$ROOT_BASE_URL/api/v1/watch` - Watch item for price drop.  Expects `url` `priceThreshold` and `notificationPhoneNumber` as POST JSON input data:
+* JSON input example: `{"url":"https://www.walmart.com/ip/Parent-s-Choice-HMO-NonGMO-Sensitivity-Infant-Formula-4-Pack-33-2oz-ea/407822086", "priceThreshold":PRICE, "notificationPhoneNumber":"5555555555"}`
+
+Full curl usage example: 
+```bash
+curl -d '{"url":"https://www.walmart.com/ip/Parent-s-Choice-HMO-NonGMO-Sensitivity-Infant-Formula-4-Pack-33-2oz-ea/407822086", "priceThreshold":74, "notificationPhoneNumber":"5555555555"}' -H "Content-Type: application/json" -X POST https://XXXXXXXX.execute-api.us-east-2.amazonaws.com/dev/api/v1/watch
+```
